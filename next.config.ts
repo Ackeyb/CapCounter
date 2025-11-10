@@ -1,11 +1,11 @@
-// next.config.ts
 import { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  swcMinify: false,
-  experimental: {
-    turbo: false, // Turbopack無効
+  // 必要な設定だけ書く
+  typescript: {
+    ignoreBuildErrors: false, // 型エラーを無視しない場合
   },
+  // experimental や swcMinify は削除
 };
 
 export default nextConfig;
