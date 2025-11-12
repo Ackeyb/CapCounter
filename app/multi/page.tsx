@@ -8,6 +8,7 @@ export default function MultiPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cupValue, setCupValue] = useState<string | number>("");
+  const [showConfirm, setShowConfirm] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [tempNames, setTempNames] = useState<string[]>([]);
   const [numPlayers, setNumPlayers] = useState(0);
@@ -46,12 +47,22 @@ export default function MultiPage() {
     setCupValue("");
   };
 
-  const handleReset = () => {
+    // 現在のプレイヤーだけリセット
+    const handleResetCurrent = () => {
     const newPlayers = [...players];
     newPlayers[currentIndex] = { ...currentPlayer, cap: 0, glass: 0 };
     setPlayers(newPlayers);
     setCupValue("");
-  };
+    setShowConfirm(false);
+    };
+
+    // 全員リセット
+    const handleResetAll = () => {
+    const newPlayers = players.map(p => ({ ...p, cap: 0, glass: 0 }));
+    setPlayers(newPlayers);
+    setCupValue("");
+    setShowConfirm(false);
+    };
 
   const goAlone = () => {
     // ひとりモードトップページに戻る
@@ -180,14 +191,46 @@ export default function MultiPage() {
 
     {/* リセットボタン */}
     <div className="flex flex-col items-center w-full max-w-md gap-4">
-    <div className="w-full">
-        <button
-        onClick={handleReset}
-        className="px-8 py-2 w-full bg-gray-700 hover:bg-gray-600 rounded text-gray-200"
-        >
-        リセット
-        </button>
-    </div>
+        <div className="w-full">
+            <button
+            onClick={() => setShowConfirm(true)}
+            className="px-8 py-2 w-full bg-gray-700 hover:bg-gray-600 rounded text-gray-200"
+            >
+            リセット
+            </button>
+        </div>
+
+        {/* 確認モーダル */}
+        {showConfirm && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full text-center shadow-lg">
+            <p className="mb-6 text-gray-200">
+                リセットする内容を選んでください。
+            </p>
+            <div className="flex flex-col gap-3">
+                <button
+                onClick={handleResetCurrent}
+                className="px-4 py-2 bg-yellow-700 hover:bg-yellow-600 rounded text-white font-medium"
+                >
+                この酒クズだけリセット
+                </button>
+                <button
+                onClick={handleResetAll}
+                className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-white font-medium"
+                >
+                全員リセット
+                </button>
+                <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-gray-200"
+                >
+                キャンセル
+                </button>
+            </div>
+            </div>
+        </div>
+        )}
+
 
     {/* 人数変更ボタン */}
     <div className="w-full">
