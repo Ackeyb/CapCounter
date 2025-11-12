@@ -2,16 +2,18 @@
 import { useState } from "react";
 
 export default function HomePage() {
-  const [capText, setCapText] = useState("0");
-  const [glassText, setGlassText] = useState("0");
+  const [capValue, setCapValue] = useState(0);
+  const [glassValue, setGlassValue] = useState(0);
   const [cupValue, setCupValue] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   // リセット実行
   const resetAll = () => {
-    setCapText("0");
-    setGlassText("0");
+    setCapValue(0);
+    setGlassValue(0);
     setCupValue(0);
+    setInputValue('');
     setShowConfirm(false);
   };
 
@@ -22,16 +24,20 @@ export default function HomePage() {
 
   // 追加処理（5で割って商と余りを分配）
   const handleAdd = () => {
-    const num = Number(cupValue);
-    if (isNaN(num)) return;
+    const numValue = cupValue || 0; // ← cupValue を使う
+    if (numValue === 0) return;
 
-    const capAdd = Math.floor(num / 5);
-    const glassAdd = num % 5;
+    let newCaps = capValue + Math.floor(numValue / 5);
+    let newGlasses = glassValue + (numValue % 5);
 
-    setCapText((prev) => String(Number(prev) + capAdd));
-    setGlassText((prev) => String(Number(prev) + glassAdd));
+    if (newGlasses >= 5) {
+      newCaps += Math.floor(newGlasses / 5);
+      newGlasses = newGlasses % 5;
+    }
 
-    setCupValue(0); // リセット
+    setCapValue(newCaps);
+    setGlassValue(newGlasses);
+    setCupValue(0); // 入力欄リセット
   };
 
   return (
@@ -46,13 +52,13 @@ export default function HomePage() {
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">キャップ</label>
           <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
-            {capText}
+            {capValue}
           </div>
         </div>
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">グラス半分</label>
           <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
-            {glassText}
+            {glassValue}
           </div>
         </div>
       </div>
