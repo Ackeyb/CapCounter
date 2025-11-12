@@ -17,27 +17,30 @@ export default function HomePage() {
     setShowConfirm(false);
   };
 
-  // 加算／減算処理
   const handleButtonClick = (value: number) => {
-    setCupValue((prev) => prev + value);
+    setCupValue(value); // ← ここを加算ではなくセットに変更
   };
 
   // 追加処理（5で割って商と余りを分配）
   const handleAdd = () => {
-    const numValue = cupValue || 0; // ← cupValue を使う
+    const numValue = cupValue || 0;
     if (numValue === 0) return;
 
-    let newCaps = capValue + Math.floor(numValue / 5);
-    let newGlasses = glassValue + (numValue % 5);
+    // 現在の総量を計算
+    let total = capValue * 5 + glassValue + numValue;
 
-    if (newGlasses >= 5) {
-      newCaps += Math.floor(newGlasses / 5);
-      newGlasses = newGlasses % 5;
+    // 新しいキャップとグラスに分解
+    const newCaps = Math.floor(total / 5);
+    let newGlasses = total % 5;
+
+    // total が負の場合、newGlasses は正しくなるように補正
+    if (newGlasses < 0) {
+      newGlasses += 5;
     }
 
     setCapValue(newCaps);
     setGlassValue(newGlasses);
-    setCupValue(0); // 入力欄リセット
+    setCupValue(0);
   };
 
   return (
@@ -90,7 +93,7 @@ export default function HomePage() {
         {Array.from({ length: 6 }).map((_, i) => (
           <button
             key={`plus-${i}`}
-            onClick={() => handleButtonClick(i + 1)}
+            onClick={() => setCupValue(i + 1)} // 数字そのままセット
             className="h-16 flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100"
           >
             ＋{i + 1}
@@ -101,7 +104,7 @@ export default function HomePage() {
         {Array.from({ length: 6 }).map((_, i) => (
           <button
             key={`minus-${i}`}
-            onClick={() => handleButtonClick(-(i + 1))}
+            onClick={() => setCupValue(-(i + 1))} // 数字そのままセット（マイナス）
             className="h-16 flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100"
           >
             －{i + 1}
