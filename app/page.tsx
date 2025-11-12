@@ -1,65 +1,141 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
 
-export default function Home() {
+export default function HomePage() {
+  const [capText, setCapText] = useState("0");
+  const [glassText, setGlassText] = useState("0");
+  const [cupValue, setCupValue] = useState(0);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // リセット実行
+  const resetAll = () => {
+    setCapText("0");
+    setGlassText("0");
+    setCupValue(0);
+    setShowConfirm(false);
+  };
+
+  // 加算／減算処理
+  const handleButtonClick = (value: number) => {
+    setCupValue((prev) => prev + value);
+  };
+
+  // 追加処理（5で割って商と余りを分配）
+  const handleAdd = () => {
+    const num = Number(cupValue);
+    if (isNaN(num)) return;
+
+    const capAdd = Math.floor(num / 5);
+    const glassAdd = num % 5;
+
+    setCapText((prev) => String(Number(prev) + capAdd));
+    setGlassText((prev) => String(Number(prev) + glassAdd));
+
+    setCupValue(0); // リセット
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-gray-200 p-6">
+      {/* タイトル */}
+      <h1 className="text-3xl font-serif mb-6 border-y-4 border-double border-gray-500 py-2 w-full text-center max-w-md text-gray-100">
+        Cap Counter
+      </h1>
+
+      {/* 上段2枠（キャップ・グラス半分） */}
+      <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-md">
+        <div className="flex flex-col items-center">
+          <label className="mb-1 text-sm text-gray-300">キャップ</label>
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
+            {capText}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <div className="flex flex-col items-center">
+          <label className="mb-1 text-sm text-gray-300">グラス半分</label>
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
+            {glassText}
+          </div>
+        </div>
+      </div>
+
+      {/* 杯入力＋追加ボタン */}
+      <div className="flex items-end justify-between mb-6 w-full max-w-md">
+        <div className="flex items-end flex-grow mr-4">
+          <div className="border border-green-500 h-12 flex-grow flex items-center justify-center rounded-sm text-gray-300">
+            <input
+              type="number"
+              value={cupValue}
+              onChange={(e) => setCupValue(Number(e.target.value) || 0)}
+              className="w-full h-full text-center bg-transparent text-gray-200 outline-none"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+          <label className="text-sm ml-2 mb-1 text-gray-300">杯</label>
         </div>
-      </main>
-    </div>
+        <button
+          onClick={handleAdd}
+          className="h-12 px-4 bg-green-900/40 hover:bg-green-800/50 rounded text-gray-200"
+        >
+          追加
+        </button>
+      </div>
+
+      {/* 12マス（6×2） */}
+      <div className="grid grid-cols-6 gap-2 mb-6 w-full max-w-md">
+        {/* 上段（＋） */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <button
+            key={`plus-${i}`}
+            onClick={() => handleButtonClick(i + 1)}
+            className="h-16 flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100"
+          >
+            ＋{i + 1}
+          </button>
+        ))}
+
+        {/* 下段（－） */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <button
+            key={`minus-${i}`}
+            onClick={() => handleButtonClick(-(i + 1))}
+            className="h-16 flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100"
+          >
+            －{i + 1}
+          </button>
+        ))}
+      </div>
+
+      {/* リセットボタン */}
+      <button
+        onClick={() => setShowConfirm(true)}
+        className="px-8 py-2 w-full max-w-md bg-gray-700 hover:bg-gray-600 rounded text-gray-200"
+      >
+        リセット
+      </button>
+
+      {/* === カスタム確認モーダル === */}
+      {showConfirm && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full text-center shadow-lg">
+            <p className="mb-6 text-gray-200">
+              表示中のデータをすべてリセットするぞ。<br />
+              本当に良いのか？
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={resetAll}
+                className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-white font-medium"
+              >
+                はい
+              </button>
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-gray-200"
+              >
+                いいえ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
