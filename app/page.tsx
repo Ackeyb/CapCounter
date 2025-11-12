@@ -1,12 +1,69 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function HomePage() {
-  // ステート定義
+  const router = useRouter();
   const [capValue, setCapValue] = useState(0);
   const [glassValue, setGlassValue] = useState(0);
   const [cupValue, setCupValue] = useState<string | number>(''); // 空文字OK
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [numPlayers, setNumPlayers] = useState(2);
+  const [playerNames, setPlayerNames] = useState<string[]>(Array(2).fill(""));
+  const [error, setError] = useState("");
+
+  // 人数変更時に名前入力欄を調整
+  const handleNumChange = (num: number) => {
+    setNumPlayers(num);
+
+    const newNames = [...playerNames];
+    while (newNames.length < num) newNames.push("");  // 足りない分を追加
+    while (newNames.length > num) newNames.pop();     // 多すぎた分を削除
+    setPlayerNames(newNames);
+  };
+
+  // 名前入力変更
+  const handleNameChange = (index: number, value: string) => {
+    const newNames = [...playerNames];
+    newNames[index] = value.slice(0, 5);
+    setPlayerNames(newNames);
+  };
+
+  // ポップアップを開く
+  const openPopup = () => {
+    const newNames = [...playerNames];
+    while (newNames.length < numPlayers) newNames.push(""); // 足りない分を追加
+    while (newNames.length > numPlayers) newNames.pop();    // 多すぎた分を削除
+    setPlayerNames(newNames);
+
+    setError("");
+    setShowPopup(true);
+  };
+
+  // 完了ボタン押下
+  const handleConfirm = () => {
+    // 入力チェック
+    if (playerNames.some((n) => n.trim() === "")) {
+      setError("全員の名前を入力してください。");
+      return;
+    }
+
+    localStorage.setItem(
+      "multiPlayerNames",
+      JSON.stringify(playerNames.slice(0, numPlayers))
+    );
+
+    setError("");
+    setShowPopup(false);
+    router.push("/multi");  
+  };
+
+  // キャンセル
+  const handleCancel = () => {
+    setShowPopup(false);
+    setError("");
+  };
 
   // リセット処理
   const resetAll = () => {
@@ -43,6 +100,69 @@ export default function HomePage() {
       <h1 className="text-3xl font-serif mb-6 border-y-4 border-double border-gray-500 py-2 w-full text-center max-w-md text-gray-100">
         Cap Counter
       </h1>
+
+      {/* === ポップアップ === */}
+      {showPopup && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full text-center shadow-lg">
+            <h2 className="text-2xl font-sans mb-4 text-gray-100">
+              複数人モード設定
+            </h2>
+
+            {/* 人数選択 */}
+            <div className="mb-4">
+              <label className="mr-2 text-gray-300">人数：</label>
+              <select
+                value={numPlayers}
+                onChange={(e) => handleNumChange(Number(e.target.value))}
+                className="bg-gray-700 text-gray-100 rounded px-2 py-1"
+              >
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}人
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 名前入力欄 */}
+            <div className="space-y-2 mb-4">
+              {playerNames.slice(0, numPlayers).map((name, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  placeholder={`酒クズ${i + 1}`}
+                  value={name}
+                  onChange={(e) => handleNameChange(i, e.target.value)}
+                  className="w-full px-2 py-1 bg-gray-700 text-gray-100 rounded outline-none"
+                  maxLength={5}
+                />
+              ))}
+            </div>
+
+            {/* エラーメッセージ */}
+            {error && (
+              <p className="text-red-400 text-sm mb-3">{error}</p>
+            )}
+
+            {/* ボタン群 */}
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 bg-green-700 hover:bg-green-600 rounded text-white font-medium"
+              >
+                完了
+              </button>
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-gray-200"
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* キャップ／グラス表示 */}
       <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-md">
@@ -142,6 +262,15 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      <div className="w-full max-w-md mt-6">
+        <button
+          onClick={openPopup}
+          className="w-full px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded text-gray-100 text-sm transition"
+        >
+          ひとりぼっちじゃないもん
+        </button>
+      </div>
     </main>
   );
 }
