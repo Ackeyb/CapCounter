@@ -2,45 +2,39 @@
 import { useState } from "react";
 
 export default function HomePage() {
+  // ステート定義
   const [capValue, setCapValue] = useState(0);
   const [glassValue, setGlassValue] = useState(0);
-  const [cupValue, setCupValue] = useState(0);
+  const [cupValue, setCupValue] = useState<string | number>(''); // 空文字OK
   const [showConfirm, setShowConfirm] = useState(false);
-  const [inputValue, setInputValue] = useState('');
 
-  // リセット実行
+  // リセット処理
   const resetAll = () => {
     setCapValue(0);
     setGlassValue(0);
-    setCupValue(0);
-    setInputValue('');
+    setCupValue('');
     setShowConfirm(false);
   };
 
-  const handleButtonClick = (value: number) => {
-    setCupValue(value); // ← ここを加算ではなくセットに変更
-  };
-
-  // 追加処理（5で割って商と余りを分配）
+  // 追加処理（総量方式）
   const handleAdd = () => {
-    const numValue = cupValue || 0;
+    const numValue = parseInt(String(cupValue)) || 0;
     if (numValue === 0) return;
 
-    // 現在の総量を計算
+    // 現在の総量から計算
     let total = capValue * 5 + glassValue + numValue;
 
-    // 新しいキャップとグラスに分解
-    const newCaps = Math.floor(total / 5);
+    let newCaps = Math.floor(total / 5);
     let newGlasses = total % 5;
 
-    // total が負の場合、newGlasses は正しくなるように補正
+    // グラスが負になった場合の補正
     if (newGlasses < 0) {
       newGlasses += 5;
     }
 
     setCapValue(newCaps);
     setGlassValue(newGlasses);
-    setCupValue(0);
+    setCupValue(''); // 入力欄をリセット（空）
   };
 
   return (
@@ -50,31 +44,35 @@ export default function HomePage() {
         Cap Counter
       </h1>
 
-      {/* 上段2枠（キャップ・グラス半分） */}
+      {/* キャップ／グラス表示 */}
       <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-md">
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">キャップ</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
             {capValue}
           </div>
         </div>
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">グラス半分</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-gray-300 text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
             {glassValue}
           </div>
         </div>
       </div>
 
-      {/* 杯入力＋追加ボタン */}
+      {/* 杯入力欄＋追加ボタン */}
       <div className="flex items-end justify-between mb-6 w-full max-w-md">
         <div className="flex items-end flex-grow mr-4">
           <div className="border border-green-500 h-12 flex-grow flex items-center justify-center rounded-sm text-gray-300">
             <input
               type="number"
               value={cupValue}
-              onChange={(e) => setCupValue(Number(e.target.value) || 0)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCupValue(val === '' ? '' : Number(val));
+              }}
               className="w-full h-full text-center bg-transparent text-gray-200 outline-none"
+              placeholder="入力…" // ← 空時の表示
             />
           </div>
           <label className="text-sm ml-2 mb-1 text-gray-300">杯</label>
@@ -87,24 +85,23 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* 12マス（6×2） */}
+      {/* ＋／－ボタン群 */}
       <div className="grid grid-cols-6 gap-2 mb-6 w-full max-w-md">
         {/* 上段（＋） */}
         {Array.from({ length: 6 }).map((_, i) => (
           <button
             key={`plus-${i}`}
-            onClick={() => setCupValue(i + 1)} // 数字そのままセット
+            onClick={() => setCupValue(i + 1)}
             className="h-16 flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100"
           >
             ＋{i + 1}
           </button>
         ))}
-
         {/* 下段（－） */}
         {Array.from({ length: 6 }).map((_, i) => (
           <button
             key={`minus-${i}`}
-            onClick={() => setCupValue(-(i + 1))} // 数字そのままセット（マイナス）
+            onClick={() => setCupValue(-(i + 1))}
             className="h-16 flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100"
           >
             －{i + 1}
@@ -120,7 +117,7 @@ export default function HomePage() {
         リセット
       </button>
 
-      {/* === カスタム確認モーダル === */}
+      {/* 確認モーダル */}
       {showConfirm && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full text-center shadow-lg">
