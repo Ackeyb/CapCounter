@@ -14,6 +14,7 @@ export default function MultiPage() {
   const [numPlayers, setNumPlayers] = useState(0);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [showBackConfirm, setShowBackConfirm] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("multiPlayerNames");
@@ -92,15 +93,26 @@ export default function MultiPage() {
     }
   };
 
-  const handleConfirm = () => {
-    if (tempNames.slice(0, numPlayers).some((n) => n.trim() === "")) {
-      setError("全員の名前を入力してください");
-      return;
-    }
-    setPlayers(tempNames.slice(0, numPlayers).map((n) => ({ name: n, cap: 0, glass: 0 })));
-    setCurrentIndex(0);
-    setShowPopup(false);
-  };
+    const handleConfirm = () => {
+      if (tempNames.slice(0, numPlayers).some((n) => n.trim() === "")) {
+        setError("全員の名前を入力してください");
+        return;
+      }
+
+      const newPlayers = tempNames.slice(0, numPlayers).map((n, i) => {
+        const existing = players[i]; // 既存プレイヤーを参照
+        // 名前が同じならそのままデータ保持、違う or 新規ならリセット
+        if (existing && existing.name === n) {
+          return existing;
+        } else {
+          return { name: n, cap: 0, glass: 0 };
+        }
+      });
+
+      setPlayers(newPlayers);
+      setCurrentIndex(0);
+      setShowPopup(false);
+    };
 
   const handleCancel = () => {
     setTempNames(players.map((p) => p.name));
@@ -121,7 +133,7 @@ export default function MultiPage() {
     <button
       key={i}
       onClick={() => switchPlayer(i)}
-      className={`h-12 w-full flex items-center justify-center rounded text-gray-100 text-sm font-mono truncate
+      className={`h-10 w-full flex items-center justify-center rounded text-gray-100 text-sm font-mono truncate
         ${i === currentIndex ? "bg-green-700 text-white" : "bg-gray-700 hover:bg-gray-600"}`}
     >
       {p.name.slice(0, 5)}
@@ -133,13 +145,13 @@ export default function MultiPage() {
       <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-md">
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">キャップ</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-3xl font-mono">
             {currentPlayer.cap}
           </div>
         </div>
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">グラス半分</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-3xl font-mono">
             {currentPlayer.glass}
           </div>
         </div>
@@ -173,7 +185,7 @@ export default function MultiPage() {
           <button
             key={`plus-${i}`}
             onClick={() => setCupValue(i + 1)}
-            className="h-16 flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100"
+            className="h-12 flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100"
           >
             ＋{i + 1}
           </button>
@@ -182,7 +194,7 @@ export default function MultiPage() {
           <button
             key={`minus-${i}`}
             onClick={() => setCupValue(-(i + 1))}
-            className="h-16 flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100"
+            className="h-12 flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100"
           >
             －{i + 1}
           </button>
@@ -232,27 +244,51 @@ export default function MultiPage() {
         )}
 
 
-    {/* 人数変更ボタン */}
-    <div className="w-full">
+      {/* 人数変更ボタン */}
+      <div className="w-full">
+          <button
+          onClick={openPopup}
+          className="px-8 py-2 w-full bg-yellow-700 hover:bg-yellow-600 rounded text-white"
+          >
+          人数を変更する
+          </button>
+      </div>
+    
+      {/* ぼっちに戻るボタン */}
+      <div className="w-full">
         <button
-        onClick={openPopup}
-        className="px-8 py-2 w-full bg-yellow-700 hover:bg-yellow-600 rounded text-white"
+          onClick={() => setShowBackConfirm(true)}
+          className="px-8 py-2 w-full bg-indigo-700 hover:bg-indigo-600 rounded text-white"
         >
-        人数を変更する
+          ぼっちに戻る
         </button>
-    </div>
-  
-    {/* ぼっちに戻るボタン */}
-    <div className="w-full">
-        <button
-        onClick={goAlone}  
-        className="px-8 py-2 w-full bg-indigo-700 hover:bg-indigo-600 rounded text-white"
-        >
-        ぼっちに戻る
-        </button>
-    </div>
+      </div>
     </div>
 
+    {showBackConfirm && (
+      <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-w-sm w-full text-center shadow-lg">
+          <p className="mb-6 text-gray-200">
+            本当にぼっちに戻るの？<br />
+            さみしくない？
+          </p>
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => router.push("/")}
+              className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-white font-medium"
+            >
+              さみしくない
+            </button>
+            <button
+              onClick={() => setShowBackConfirm(false)}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded text-gray-200"
+            >
+              やっぱりさみしい
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
 
       {/* === ポップアップ === */}
       {showPopup && (
@@ -267,9 +303,9 @@ export default function MultiPage() {
                 onChange={(e) => handleNumChange(Number(e.target.value))}
                 className="bg-gray-700 text-gray-100 rounded px-2 py-1"
               >
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}人
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <option key={i + 2} value={i + 2}>
+                    {i + 2}人
                   </option>
                 ))}
               </select>

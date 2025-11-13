@@ -117,11 +117,11 @@ export default function HomePage() {
                 onChange={(e) => handleNumChange(Number(e.target.value))}
                 className="bg-gray-700 text-gray-100 rounded px-2 py-1"
               >
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}人
-                  </option>
-                ))}
+              {Array.from({ length: 9 }).map((_, i) => (
+                <option key={i + 2} value={i + 2}>
+                  {i + 2}人
+                </option>
+              ))}
               </select>
             </div>
 
@@ -168,13 +168,13 @@ export default function HomePage() {
       <div className="grid grid-cols-2 gap-4 mb-6 w-full max-w-md">
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">キャップ</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-3xl font-mono">
             {capValue}
           </div>
         </div>
         <div className="flex flex-col items-center">
           <label className="mb-1 text-sm text-gray-300">グラス半分</label>
-          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-2xl font-mono">
+          <div className="border border-red-500 h-20 w-full flex items-center justify-center rounded-sm text-3xl font-mono">
             {glassValue}
           </div>
         </div>
@@ -266,7 +266,7 @@ export default function HomePage() {
       <div className="w-full max-w-md mt-6">
         <button
           onClick={openPopup}
-          className="w-full px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded text-gray-100 text-sm transition"
+          className="w-full px-8 py-2 bg-indigo-700 hover:bg-indigo-600 rounded text-gray-200 font-normal transition"
         >
           ひとりぼっちじゃないもん
         </button>
