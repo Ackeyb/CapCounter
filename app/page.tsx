@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { applyGlassDelta } from "@/lib/counter";
 
 export default function HomePage() {
   const router = useRouter();
@@ -79,18 +80,14 @@ export default function HomePage() {
     if (numValue === 0) return;
 
     // 現在の総量から計算
-    let total = capValue * 5 + glassValue + numValue;
+    const next = applyGlassDelta(
+      { cap: capValue, glass: glassValue },
+      numValue
+    );
 
-    let newCaps = Math.floor(total / 5);
-    let newGlasses = total % 5;
-
-    // グラスが負になった場合の補正
-    if (newGlasses < 0) {
-      newGlasses += 5;
-    }
-
-    setCapValue(newCaps);
-    setGlassValue(newGlasses);
+    // キャップ/グラスを正規化して更新
+    setCapValue(next.cap);
+    setGlassValue(next.glass);
     setCupValue(''); // 入力欄をリセット（空）
   };
 

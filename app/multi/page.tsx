@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { applyGlassDelta } from "@/lib/counter";
 
 type Player = { name: string; cap: number; glass: number };
 
@@ -38,12 +39,10 @@ export default function MultiPage() {
     const numValue = parseInt(String(cupValue)) || 0;
     if (numValue === 0) return;
 
-    let total = currentPlayer.cap * 5 + currentPlayer.glass + numValue;
-    const newCap = Math.floor(total / 5);
-    const newGlass = total % 5;
+    const next = applyGlassDelta(currentPlayer, numValue);
 
     const newPlayers = [...players];
-    newPlayers[currentIndex] = { ...currentPlayer, cap: newCap, glass: newGlass };
+    newPlayers[currentIndex] = { ...currentPlayer, ...next };
     setPlayers(newPlayers);
     setCupValue("");
   };
