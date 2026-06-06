@@ -14,11 +14,11 @@ type CounterPanelProps = {
 type UnitButtonProps = {
   label: string;
   isSelected: boolean;
-  heightClass: string;
   onClick: () => void;
 };
 
 const cupChoices = Array.from({ length: 6 }, (_, i) => i + 1);
+const quickButtonWidthClass = "w-[calc((min(100vw-3rem,28rem)-2.5rem)/6)]";
 
 export function CounterPanel({
   cap,
@@ -53,13 +53,11 @@ export function CounterPanel({
             <UnitButton
               label="キャップ"
               isSelected={cupInputMode === "cap"}
-              heightClass={buttonHeightClass}
               onClick={() => onCupInputModeChange("cap")}
             />
             <UnitButton
               label="半分"
               isSelected={cupInputMode === "glass"}
-              heightClass={buttonHeightClass}
               onClick={() => onCupInputModeChange("glass")}
             />
           </div>
@@ -109,16 +107,11 @@ export function CounterPanel({
   );
 }
 
-function UnitButton({
-  label,
-  isSelected,
-  heightClass,
-  onClick,
-}: UnitButtonProps) {
+function UnitButton({ label, isSelected, onClick }: UnitButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`${heightClass} w-16 flex items-center justify-center rounded text-xs ${
+      className={`h-12 ${quickButtonWidthClass} flex items-center justify-center rounded text-xs ${
         isSelected
           ? "bg-green-700 text-white"
           : "bg-gray-700 text-gray-200 hover:bg-gray-600"

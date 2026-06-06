@@ -17,14 +17,14 @@ test("borrows from cap when subtracting from zero glass", () => {
   });
 });
 
-test("keeps the mathematical representation for negative totals", () => {
+test("keeps negative remainders in glass for negative totals", () => {
   assert.deepEqual(applyGlassDelta({ cap: 0, glass: 3 }, -4), {
-    cap: -1,
-    glass: 4,
+    cap: 0,
+    glass: -1,
   });
 });
 
-test("normalizes larger positive and negative deltas", () => {
+test("keeps signed remainders for larger positive and negative deltas", () => {
   assert.deepEqual(applyGlassDelta({ cap: 2, glass: 2 }, 8), {
     cap: 4,
     glass: 0,
@@ -32,6 +32,10 @@ test("normalizes larger positive and negative deltas", () => {
   assert.deepEqual(applyGlassDelta({ cap: 2, glass: 2 }, -3), {
     cap: 1,
     glass: 4,
+  });
+  assert.deepEqual(applyGlassDelta({ cap: 0, glass: 0 }, -6), {
+    cap: -1,
+    glass: -1,
   });
 });
 

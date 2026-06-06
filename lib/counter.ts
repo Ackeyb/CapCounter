@@ -10,11 +10,11 @@ export function applyGlassDelta(
   delta: number
 ): CounterValue {
   const total = current.cap * GLASSES_PER_CAP + current.glass + delta;
-  const glass =
-    ((total % GLASSES_PER_CAP) + GLASSES_PER_CAP) % GLASSES_PER_CAP;
+  const cap = Math.trunc(total / GLASSES_PER_CAP);
+  const glass = total % GLASSES_PER_CAP;
 
   return {
-    cap: Math.floor(total / GLASSES_PER_CAP),
+    cap: Object.is(cap, -0) ? 0 : cap,
     glass,
   };
 }
