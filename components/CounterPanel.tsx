@@ -1,12 +1,21 @@
-import { CupValue } from "@/lib/useCounter";
+import { addToCupValue, CupInputMode, CupValue } from "@/lib/useCounter";
 
 type CounterPanelProps = {
   cap: number;
   glass: number;
   cupValue: CupValue;
+  cupInputMode: CupInputMode;
   onCupValueChange: (value: CupValue) => void;
+  onCupInputModeChange: (mode: CupInputMode) => void;
   onAdd: () => void;
   buttonHeightClass?: string;
+};
+
+type UnitButtonProps = {
+  label: string;
+  isSelected: boolean;
+  heightClass: string;
+  onClick: () => void;
 };
 
 const cupChoices = Array.from({ length: 6 }, (_, i) => i + 1);
@@ -15,7 +24,9 @@ export function CounterPanel({
   cap,
   glass,
   cupValue,
+  cupInputMode,
   onCupValueChange,
+  onCupInputModeChange,
   onAdd,
   buttonHeightClass = "h-16",
 }: CounterPanelProps) {
@@ -36,9 +47,23 @@ export function CounterPanel({
         </div>
       </div>
 
-      <div className="flex items-end justify-between mb-6 w-full max-w-md">
-        <div className="flex items-end flex-grow mr-4">
-          <div className="border border-green-500 h-12 flex-grow flex items-center justify-center rounded-sm text-gray-300">
+      <div className="flex items-end justify-between gap-2 mb-6 w-full max-w-md">
+        <div className="flex items-end flex-grow min-w-0 gap-2">
+          <div className="grid grid-cols-2 gap-2 shrink-0">
+            <UnitButton
+              label="キャップ"
+              isSelected={cupInputMode === "cap"}
+              heightClass={buttonHeightClass}
+              onClick={() => onCupInputModeChange("cap")}
+            />
+            <UnitButton
+              label="半分"
+              isSelected={cupInputMode === "glass"}
+              heightClass={buttonHeightClass}
+              onClick={() => onCupInputModeChange("glass")}
+            />
+          </div>
+          <div className="border border-green-500 h-12 flex-grow min-w-0 flex items-center justify-center rounded-sm text-gray-300">
             <input
               type="number"
               value={cupValue}
@@ -50,11 +75,11 @@ export function CounterPanel({
               placeholder="入力…"
             />
           </div>
-          <label className="text-sm ml-2 mb-1 text-gray-300">杯</label>
+          <label className="text-sm mb-1 text-gray-300">杯</label>
         </div>
         <button
           onClick={onAdd}
-          className="h-12 px-4 bg-green-900/40 hover:bg-green-800/50 rounded text-gray-200"
+          className="h-12 px-4 bg-green-900/40 hover:bg-green-800/50 rounded text-gray-200 shrink-0"
         >
           追加
         </button>
@@ -64,7 +89,7 @@ export function CounterPanel({
         {cupChoices.map((value) => (
           <button
             key={`plus-${value}`}
-            onClick={() => onCupValueChange(value)}
+            onClick={() => onCupValueChange(addToCupValue(cupValue, value))}
             className={`${buttonHeightClass} flex items-center justify-center bg-blue-900/40 hover:bg-blue-800/50 rounded text-gray-100`}
           >
             ＋{value}
@@ -73,7 +98,7 @@ export function CounterPanel({
         {cupChoices.map((value) => (
           <button
             key={`minus-${value}`}
-            onClick={() => onCupValueChange(-value)}
+            onClick={() => onCupValueChange(addToCupValue(cupValue, -value))}
             className={`${buttonHeightClass} flex items-center justify-center bg-pink-900/40 hover:bg-pink-800/50 rounded text-gray-100`}
           >
             －{value}
@@ -81,5 +106,26 @@ export function CounterPanel({
         ))}
       </div>
     </>
+  );
+}
+
+function UnitButton({
+  label,
+  isSelected,
+  heightClass,
+  onClick,
+}: UnitButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`${heightClass} w-16 flex items-center justify-center rounded text-xs ${
+        isSelected
+          ? "bg-green-700 text-white"
+          : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+      }`}
+      type="button"
+    >
+      {label}
+    </button>
   );
 }

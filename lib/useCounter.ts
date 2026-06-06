@@ -4,16 +4,31 @@ import { useState } from "react";
 import { applyGlassDelta, CounterValue } from "./counter";
 
 export type CupValue = string | number;
+export type CupInputMode = "cap" | "glass";
 
-function parseCupValue(cupValue: CupValue): number {
+const GLASSES_PER_CAP = 5;
+
+export function parseCupValue(cupValue: CupValue): number {
   return parseInt(String(cupValue)) || 0;
+}
+
+export function getCupDelta(
+  cupValue: CupValue,
+  cupInputMode: CupInputMode
+): number {
+  const parsedValue = parseCupValue(cupValue);
+  return cupInputMode === "cap" ? parsedValue * GLASSES_PER_CAP : parsedValue;
+}
+
+export function addToCupValue(cupValue: CupValue, delta: number): number {
+  return parseCupValue(cupValue) + delta;
 }
 
 export function useCupInput(onApply: (delta: number) => void) {
   const [cupValue, setCupValue] = useState<CupValue>("");
-
+  const [cupInputMode, setCupInputMode] = useState<CupInputMode>("glass");
   const submitCupValue = () => {
-    const delta = parseCupValue(cupValue);
+    const delta = getCupDelta(cupValue, cupInputMode);
     if (delta === 0) return;
 
     onApply(delta);
@@ -26,7 +41,9 @@ export function useCupInput(onApply: (delta: number) => void) {
 
   return {
     cupValue,
+    cupInputMode,
     setCupValue,
+    setCupInputMode,
     submitCupValue,
     clearCupValue,
   };

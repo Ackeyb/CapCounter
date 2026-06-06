@@ -32,8 +32,14 @@ export default function MultiPage() {
   const [showBackConfirm, setShowBackConfirm] = useState(false);
   const router = useRouter();
   const currentPlayer = players[currentIndex];
-  const { cupValue, setCupValue, submitCupValue, clearCupValue } = useCupInput(
-    (delta) => {
+  const {
+    cupValue,
+    cupInputMode,
+    setCupValue,
+    setCupInputMode,
+    submitCupValue,
+    clearCupValue,
+  } = useCupInput((delta) => {
       setPlayers((currentPlayers) => {
         const player = currentPlayers[currentIndex];
         if (!player) return currentPlayers;
@@ -45,8 +51,7 @@ export default function MultiPage() {
         };
         return nextPlayers;
       });
-    }
-  );
+    });
 
   if (!currentPlayer) return null;
 
@@ -95,7 +100,9 @@ export default function MultiPage() {
         cap={currentPlayer.cap}
         glass={currentPlayer.glass}
         cupValue={cupValue}
+        cupInputMode={cupInputMode}
         onCupValueChange={setCupValue}
+        onCupInputModeChange={setCupInputMode}
         onAdd={submitCupValue}
         buttonHeightClass="h-12"
       />

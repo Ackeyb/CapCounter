@@ -12,7 +12,9 @@ export default function HomePage() {
   const {
     counter,
     cupValue,
+    cupInputMode,
     setCupValue,
+    setCupInputMode,
     submitCupValue,
     resetCounter,
   } = useCounter();
@@ -49,7 +51,9 @@ export default function HomePage() {
         cap={counter.cap}
         glass={counter.glass}
         cupValue={cupValue}
+        cupInputMode={cupInputMode}
         onCupValueChange={setCupValue}
+        onCupInputModeChange={setCupInputMode}
         onAdd={submitCupValue}
       />
 

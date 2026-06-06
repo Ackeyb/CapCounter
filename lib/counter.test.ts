@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { applyGlassDelta } from "./counter";
+import { addToCupValue, getCupDelta } from "./useCounter";
 
 test("increments a cap when glasses reach five", () => {
   assert.deepEqual(applyGlassDelta({ cap: 0, glass: 4 }, 1), {
@@ -32,4 +33,21 @@ test("normalizes larger positive and negative deltas", () => {
     cap: 1,
     glass: 4,
   });
+});
+
+test("keeps glass input mode as half-glass deltas", () => {
+  assert.equal(getCupDelta(3, "glass"), 3);
+  assert.equal(getCupDelta(-2, "glass"), -2);
+});
+
+test("converts cap input mode to five half-glass deltas", () => {
+  assert.equal(getCupDelta(3, "cap"), 15);
+  assert.equal(getCupDelta(-2, "cap"), -10);
+});
+
+test("adds quick button values to the current cup input", () => {
+  assert.equal(addToCupValue("", 5), 5);
+  assert.equal(addToCupValue(5, 5), 10);
+  assert.equal(addToCupValue(10, -6), 4);
+  assert.equal(addToCupValue(4, -6), -2);
 });
